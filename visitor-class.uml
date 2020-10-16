@@ -1,0 +1,65 @@
+@startuml
+
+skinparam roundcorner 11
+skinparam maxmessagesize 88
+skinparam notefontsize 8
+
+class iob{
+    virtual void show() = 0;
+    virtual void accept(uptr<ivis>) = 0;
+}
+
+class oba{
+    virtual void accept(uptr<ivis> v) override {v->vis(*this);}
+    void show()override
+}
+class obb{
+    virtual void accept(uptr<ivis> v) override {v->vis(*this);}
+    void show()override
+}
+class obc{
+    virtual void accept(uptr<ivis> v) override {v->vis(*this);}
+    void show()override
+}
+
+iob <|-- oba
+iob <|-- obb
+iob <|-- obc
+
+class ivis {
+    virtual void vis(oba)=0;
+    virtual void vis(obb)=0;
+}
+
+class visa {
+    void vis(oba ob)override { ob.show(); }
+    void vis(obb ob)override { ob.show(); }
+}
+
+ivis <|-- visa
+
+iob -> ivis
+ivis -> oba
+ivis -> obb
+
+note as example_of_call
+
+void a(  ){
+    vec< uptr<iob> > obs;
+    obs.push_back( std::make_unique<oba>());
+    obs.push_back( std::make_unique<obb>());
+
+    uptr<ivis> v = std::make_unique<visb>();
+    for (auto& e:obs){
+        e->accept(v);
+    }
+
+    v = std::make_unique<visa>();
+    for (auto& e:obs){
+        e->accept(v);
+    }
+}
+
+end note
+
+@enduml
